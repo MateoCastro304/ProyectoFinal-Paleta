@@ -5,8 +5,8 @@
 I2CScanner scanner;
 
 //if you use ESP8266-01 with not default SDA and SCL pins, define these 2 lines, else delete them	
-#define SDA_PIN 4
-#define SCL_PIN 5
+#define SDA_PIN D1
+#define SCL_PIN D2
 
 void setup() 
 {	
