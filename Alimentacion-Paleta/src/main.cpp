@@ -4,24 +4,35 @@
 // Informacion sobre puertos GPIO ESP8266
 /* https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/ */
 
-const byte STAT = 13;
+const byte mosfetSupplyPin = 13;
 const byte ledTest = 14;
-const int analogInPin = 17;  // ESP8266 Analog Pin ADC0 = 17
+const byte analogInPin = 17;  // ESP8266 Analog Pin ADC0 = 17
 
 #define lcdAdd 0x27
 LiquidCrystal_I2C lcd(lcdAdd,16,2);
 
+void lcdShowValueBattery(const uint8_t analogPinBat, float batVolt){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("[ADC] = ");
+  lcd.print(analogRead(analogPinBat));
+  lcd.setCursor(0,1);
+  lcd.print("[V] = ");
+  lcd.print(batVolt);
+}
+
 void setup() {
   pinMode(analogInPin,INPUT);
   pinMode(ledTest, OUTPUT);        // Configura el pin del LED como salida
-  pinMode(STAT, OUTPUT);
+  pinMode(mosfetSupplyPin, OUTPUT);
 
-  digitalWrite(STAT,HIGH);
+  digitalWrite(mosfetSupplyPin,HIGH);
   
   Serial.begin(9600);
+
   delay(10);
 
-  Wire.begin(SDA,SCL);
+  Wire.begin(SDA,SCL); //D1 = SCL, D2 = SDA
 
   lcd.init();
   delay(10);
@@ -35,17 +46,9 @@ void loop() {
   static int previousMillis[2] = {0,0};
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis[0] >= interval[0]) {
-    // Guardar el tiempo actual
-    // lcd.clear();
-    // int analogValue = analogRead(analogInPin);
-    // float BatRead = ( (float)analogValue * 4.84)/1023.0;
-    // // print the readings in the Serial Monitor
-    // lcd.setCursor(0,0);
-    // lcd.print("Analog= ");
-    // lcd.print(analogValue);
-    // lcd.setCursor(0,1);
-    // lcd.print("Bat= ");
-    // lcd.print(BatRead);
+
+    float batCharge = ((float) analogRead(analogInPin) * 4.84)/1023.0;
+    lcdShowValueBattery(analogInPin, batCharge);
     digitalWrite(ledTest,!digitalRead(ledTest));
 
     previousMillis[0] = currentMillis;
@@ -54,6 +57,6 @@ void loop() {
   {
     previousMillis[1] = currentMillis;
     Serial.println("Sistema apagado");
-    digitalWrite(STAT, LOW);
+    digitalWrite(mosfetSupplyPin, LOW);
   }
 }
