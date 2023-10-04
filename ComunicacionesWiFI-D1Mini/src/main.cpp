@@ -6,7 +6,7 @@
 */
 
 #include <ESP8266WiFi.h>
-
+#include <espnow.h>
 #ifndef STASSID
 
   #define STASSID "Electronica_ALUMNOS"
@@ -14,11 +14,34 @@
 
 #endif
 
+//My MAC: 3C:61:05:D1:C2:49
+//Oth MAC: 84:F3:EB:4C:A0:DF
+
 const char* ssid     = STASSID;
 const char* password = STAPSK;
 
-//const char* host = "djxmmx.net";
-//const uint16_t port = 17;
+typedef struct struct_message {
+    char a[32];
+    int b;
+    float c;
+    String d;
+    bool e;
+} struct_message;
+
+struct_message myData;
+
+
+uint8_t broadcastAddress[] = {0x84, 0xF3, 0xEB, 0x4C, 0xA0, 0xDF};
+// Callback when data is sent
+void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
+  Serial.print("Last Packet Send Status: ");
+  if (sendStatus == 0){
+    Serial.println("Delivery success");
+  }
+  else{
+    Serial.println("Delivery fail");
+  }
+}
 
 void setup() {
   Serial.begin(9600);
@@ -34,67 +57,41 @@ void setup() {
      would try to act as both a client and an access-point and could cause
      network-issues with your other WiFi-devices on your WiFi-network. */
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  //WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  /*while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+  }*/
+  // Init ESP-NOW
+  if (esp_now_init() != 0) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  // Once ESPNow is successfully Init, we will register for Send CB to
+  // get the status of Trasnmitted packet
+  esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
+  esp_now_register_send_cb(OnDataSent);
+  // Register peer
+  esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
+
 }
 
 void loop() {
-  //static bool wait = false;
+  static unsigned long lastTime = 0;  
+  const int timerDelay = 2000;
+  if ((millis() - lastTime) > timerDelay) {
+    // Set values to send
+    strcpy(myData.a, "THIS IS A CHAR");
+    myData.b = random(1,20);
+    myData.c = 1.2;
+    myData.d = "Hello";
+    myData.e = false;
 
-  // Serial.print("connecting to ");
-  // Serial.print(host);
-  // Serial.print(':');
-  // Serial.println(port);
+    // Send message via ESP-NOW
+    esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
 
-  // Use WiFiClient class to create TCP connections
-  // WiFiClient client;
-  // if (!client.connect(host, port)) {
-  //   Serial.println("connection failed");
-  //   delay(5000);
-  //   return;
-  // }
-
-  // This will send a string to the server
-  // Serial.println("sending data to server");
-  // if (client.connected()) {
-  //   client.println("hello from ESP8266");
-  // }
-
-  // // wait for data to be available
-  // unsigned long timeout = millis();
-  // while (client.available() == 0) {
-  //   if (millis() - timeout > 5000) {
-  //     Serial.println(">>> Client Timeout !");
-  //     client.stop();
-  //     delay(60000);
-  //     return;
-  //   }
-  // }
-
-  // // Read all the lines of the reply from server and print them to Serial
-  // Serial.println("receiving from remote server");
-  // // not testing 'client.connected()' since we do not need to send data here
-  // while (client.available()) {
-  //   char ch = static_cast<char>(client.read());
-  //   Serial.print(ch);
-  // }
-
-  // // Close the connection
-  // Serial.println();
-  // Serial.println("closing connection");
-  // client.stop();
-
-  // if (wait) {
-  //   delay(300000); // execute once every 5 minutes, don't flood remote service
-  // }
-  // wait = true;
+    lastTime = millis();
+  }
 }
