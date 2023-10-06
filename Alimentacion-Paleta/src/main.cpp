@@ -47,7 +47,7 @@ void loop() {
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis[0] >= interval[0]) {
 
-    float batCharge = ((float) analogRead(analogInPin) * 4.84)/1023.0;
+    float batCharge = ((float) analogRead(analogInPin) * 5.1)/1023.0;
     lcdShowValueBattery(analogInPin, batCharge);
     digitalWrite(ledTest,!digitalRead(ledTest));
 
