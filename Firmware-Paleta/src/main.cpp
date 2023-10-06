@@ -11,6 +11,7 @@ void setup()
   mpu.initialize();
   pinMode(ledGolpe,OUTPUT);
 
+  mpuSetConfig();
   Serial.println(mpu.testConnection() ? "IMU iniciado correctamente" : "Error al iniciar IMU");
 
   // Configurar sensibilidad del acelerómetro (0 = +/- 2g, 1 = +/- 4g, 2 = +/- 8g, 3 = +/- 16g)
