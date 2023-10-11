@@ -31,8 +31,13 @@ typedef struct struct_message {
 struct_message myData;
 
 
+//ESP01 MAC: 84:F3:EB:4C:A0:DF
+//WEMOS MAC: 3C:61:05:D1:C2:49
+//NODEMCU MAC: A4:CF:12:C9:91:48
 uint8_t macESP01[] = {0x84, 0xF3, 0xEB, 0x4C, 0xA0, 0xDF};
 uint8_t macWemos[] = {0x3C, 0x61, 0x05, 0xD1, 0xC2, 0x49};
+uint8_t macNodeMCU[] = {0xA4, 0xCF, 0x12, 0xC9, 0x91, 0x48};
+
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
     Serial.print("Last Packet Send Status: ");
@@ -61,7 +66,18 @@ void setup() {
     Serial.println("ESPNOW two-way initializing: ");
 
     WiFi.mode(WIFI_STA);
-    WiFi.disconnect();
+    WiFi.begin(STASSID, STAPSK);
+    Serial.print("\nConnecting to ");
+    Serial.println(STASSID);
+
+    while (WiFi.status() != WL_CONNECTED) {
+      Serial.print('.');
+      delay(500);
+    }
+    Serial.println();
+    Serial.print("connected, address=");
+    Serial.println(WiFi.localIP());
+    //WiFi.disconnect();
     // Init ESP-NOW
     if (esp_now_init() != 0) {
         Serial.println("Error initializing ESP-NOW");
@@ -76,7 +92,12 @@ void setup() {
     esp_now_register_recv_cb(OnDataRecv);
 
     // Register peer
-    esp_now_add_peer(macESP01, ESP_NOW_ROLE_COMBO, 1, NULL, 0);
+    esp_now_add_peer(macNodeMCU, ESP_NOW_ROLE_COMBO, 1, NULL, 0);
+    // esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
+    // esp_now_register_send_cb(OnDataSent);
+  
+    // // Register peer
+    // esp_now_add_peer(macNodeMCU, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
 }
 
 void loop() {
@@ -93,7 +114,7 @@ void loop() {
         myData.e = !myData.e;
 
         // Send message via ESP-NOW
-        esp_now_send(macESP01, (uint8_t *) &myData, sizeof(myData));
+        esp_now_send(macNodeMCU, (uint8_t *) &myData, sizeof(myData));
         i += 0.5;
         lastTime = millis();
     }

@@ -16,8 +16,6 @@ typedef struct ang{
 }ang;
 
 bool mpuSetConfig();
-
-
 ang updateRotation();
 
 #endif  
