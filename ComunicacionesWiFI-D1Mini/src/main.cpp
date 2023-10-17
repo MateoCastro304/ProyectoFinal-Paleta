@@ -7,13 +7,11 @@
 
 #include <ESP8266WiFi.h>
 //#include <espnow.h>
-#include "ESPNOWPaddel.h"
+#include "EspNow-Paddel.h"
 
 #ifndef STASSID
-
     #define STASSID "Electronica_ALUMNOS"
     #define STAPSK  "alumnosElec2022"
-
 #endif
 
 //My MAC: 3C:61:05:D1:C2:49
