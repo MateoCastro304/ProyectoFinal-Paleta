@@ -1,51 +1,103 @@
 #include <Arduino.h>
+#include <I2Cdev.h>
+#include <MPU6050.h>
+#include <Wire.h>
+#include <Adafruit_BMP280.h>
 #include "HeaderPaleta.h"
+#include "IMUpadel.h"
 
+MPU6050 MPU(0x68);
+Adafruit_BMP280 BMP; // I2C
 void setup()
 {
+  
+  pinMode(analogInPin, INPUT);
+  pinMode(mosfetSupplyPin, OUTPUT);
+  pinMode(ledGolpe, OUTPUT);
+  
+  digitalWrite(mosfetSupplyPin, HIGH);
+  
   Serial.begin(9600);
-  Wire.begin(D1,D2);
-  delay(10);
+  Serial.println();
+  
+  delay(500);
 
+  Wire.begin(PIN_SDA, PIN_SCL);
+  Wire.setClock(400000);
 
-  mpu.initialize();
-  pinMode(ledGolpe,OUTPUT);
+  delay(1000);
+  
+  // MPU.initialize();
+  // while (!MPU.testConnection())
+  // {
+  //   Wire.begin(PIN_SDA, PIN_SCL);
+  //   Serial.println("Error al iniciar IMU");
+  //   Serial.println("intentando inicializar nuevamente...");
+  //   MPU.initialize();
+  //   delay(2000);
+  // }
+  
+  if (mpuSetConfig())
+  {
+    Serial.println("MPU Iniciado correctamente");
+  }else{
+    while (!mpuSetConfig())
+    {
+      Serial.println("Error al iniciar MPU");
+      Serial.println("intentando inicializar nuevamente...");
 
-  mpuSetConfig();
-  Serial.println(mpu.testConnection() ? "IMU iniciado correctamente" : "Error al iniciar IMU");
+      Wire.begin(PIN_SDA, PIN_SCL);
+      Wire.setClock(400000);
+      MPU.initialize();
+      delay(2000);
+    }
+    Serial.println("MPU Iniciado");
+  }
 
-  // Configurar sensibilidad del acelerómetro (0 = +/- 2g, 1 = +/- 4g, 2 = +/- 8g, 3 = +/- 16g)
-  mpu.setFullScaleAccelRange(0);
+  if (!BMP.begin(BMP280_ADDRESS_ALT))
+  {
+    Serial.println("No se pudo iniciar BMP");
+  }else{
+    Serial.println("BMP Iniciado correctamente");
+  }
 
-  // Configurar interrupción para detección de golpes (opcional)
-  //mpu.setIntDataReadyEnabled(false);  // Deshabilitar interrupción de datos listos
-  mpu.setInterruptMode(1);            // Interrupción cuando se detecta un golpe
-  mpu.setInterruptLatch(0);           // Latch hasta que se lea el registro INT_STATUS
-  mpu.setMotionDetectionThreshold(100); // Establecer umbral de detección de movimiento (ajustar según sea necesario)
-  mpu.setMotionDetectionDuration(2);  // Establecer duración mínima para que se considere un golpe
+  BMP.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 }
 
 void loop()
 {
   ang incDisp = updateRotation();
-  if (mpu.getIntMotionStatus()) {
+  if (MPU.getIntMotionStatus()) {
+    
     Serial.print(F("Rotacion en X:  "));
     Serial.print(incDisp.x);
     Serial.print(F("\t Rotacion en Y: "));
     Serial.println(incDisp.y);
+
+    Serial.print(F("Approx altitude = "));
+    Serial.print(BMP.readAltitude(1013.25)); /* Adjusted to local forecast! */
+    Serial.println(" m");
+
     digitalWrite(ledGolpe, HIGH); // Encender LED
     delay(1000);             // Mantener encendido por 100 ms
     digitalWrite(ledGolpe, LOW);  // Apagar LED
 
-    mpu.getIntStatus();
+    MPU.getIntStatus();
   }
-  static const int interval=10;
+  static const int interval=10000;
   static int previousMillis=0;
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
     // Guardar el tiempo actual
     previousMillis = currentMillis;
-    // Serial.print(F("Rotacion en X:  "));
+    Serial.println(MPU.testConnection() ? "IMU funcionando" : "Error IMU");
+    Serial.print(F("Pressure = "));
+    Serial.print(BMP.readPressure());
+    Serial.println(" Pa");
     // Serial.print(incDisp.x);
     // Serial.print(F("\t Rotacion en Y: "));
     // Serial.println(incDisp.y);
