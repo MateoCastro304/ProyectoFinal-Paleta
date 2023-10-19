@@ -1,21 +1,9 @@
-#include <Arduino.h>
-
-/*
-    This sketch establishes a TCP connection to a "quote of the day" service.
-    It sends a "hello" message, and then prints received data.
-*/
-
-#include <ESP8266WiFi.h>
-//#include <espnow.h>
 #include "EspNow-Paddel.h"
 
 #ifndef STASSID
     #define STASSID "Electronica_ALUMNOS"
     #define STAPSK  "alumnosElec2022"
 #endif
-
-//My MAC: 3C:61:05:D1:C2:49
-//Oth MAC: 84:F3:EB:4C:A0:DF
 
 const char* ssid     = STASSID;
 const char* password = STAPSK;
@@ -29,16 +17,12 @@ typedef struct data_paddel {
 } data_paddel;
 
 data_paddel myData;
-
-
 //ESP01 MAC: 84:F3:EB:4C:A0:DF
 //WEMOS MAC: 3C:61:05:D1:C2:49
 //NODEMCU MAC: A4:CF:12:C9:91:48
 // uint8_t macESP01[] = {0x84, 0xF3, 0xEB, 0x4C, 0xA0, 0xDF};
 // uint8_t macWemos[] = {0x3C, 0x61, 0x05, 0xD1, 0xC2, 0x49};
 // uint8_t macNodeMCU[] = {0xA4, 0xCF, 0x12, 0xC9, 0x91, 0x48};
-
-// Callback when data is sent
 // void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
 //     Serial.print("Last Packet Send Status: ");
 //     if (sendStatus == 0){
@@ -48,11 +32,7 @@ data_paddel myData;
 //         Serial.println("Delivery fail");
 //     }
 // }
-
-
-// Callback when data is received
-
-char recvAsk[50];
+//char recvAsk[50];
 // void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
 //     memcpy(&recvAsk,incomingData,sizeof(recvAsk));
 //     String impresion(recvAsk);
@@ -86,7 +66,7 @@ void setup() {
     // }
 
     set_espnow(ESP_NOW_ROLE_COMBO);
-    //set_peer(macNodeMCU, ESP_NOW_ROLE_COMBO);
+    set_peer(macNodeMCU, ESP_NOW_ROLE_COMBO);
     
     // Once ESPNow is successfully Init, we will register for Send CB to
     // get the status of Trasnmitted packet

@@ -17,8 +17,8 @@ bool set_espnow(uint8_t rol){
     return 1;
 }
 
-/*void set_peer(uint8_t *mac_dev, uint8_t rol){
+void set_peer(uint8_t *mac_dev, uint8_t rol){
     esp_now_add_peer(mac_dev, rol, 1, NULL, 0);
     dev_to_send = mac_dev;
-}*/
+}
 
