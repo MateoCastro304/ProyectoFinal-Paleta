@@ -9,16 +9,17 @@ const byte ledTest = 14;
 const byte analogInPin = 17;  // ESP8266 Analog Pin ADC0 = 17
 
 #define lcdAdd 0x27
-LiquidCrystal_I2C lcd(lcdAdd,16,2);
+//LiquidCrystal_I2C lcd(lcdAdd,16,2);
 
 void lcdShowValueBattery(const uint8_t analogPinBat, float batVolt){
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("[ADC] = ");
-  lcd.print(analogRead(analogPinBat));
-  lcd.setCursor(0,1);
-  lcd.print("[V] = ");
-  lcd.print(batVolt);
+  //Serial.clear();
+  //Serial.setCursor(0,0);
+  Serial.print("[ADC] = ");
+  Serial.println(analogRead(analogPinBat));
+  //Serial.setCursor(0,1);
+  Serial.print("[V] = ");
+  Serial.println(batVolt);
+  Serial.println();
 }
 
 void setup() {
@@ -32,17 +33,16 @@ void setup() {
 
   delay(10);
 
-  Wire.begin(SDA,SCL); //D1 = SCL, D2 = SDA
-
-  lcd.init();
+  //Wire.begin(SDA,SCL); //D1 = SCL, D2 = SDA
+  //lcd.init();
   delay(10);
-  lcd.backlight();
-  lcd.clear();
+  //lcd.backlight();
+  //lcd.clear();
 }
 
 void loop() {
   // read the analog in value
-  static const int interval[2]={500,8000};
+  static const int interval[2]={200,8000};
   static int previousMillis[2] = {0,0};
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis[0] >= interval[0]) {

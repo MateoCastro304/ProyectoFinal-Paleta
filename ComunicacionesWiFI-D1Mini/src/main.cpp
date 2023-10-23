@@ -60,12 +60,10 @@ void setup() {
     Serial.println(WiFi.localIP());
     //WiFi.disconnect();
     // Init ESP-NOW
-    // if (esp_now_init() != 0) {
-    //     Serial.println("Error initializing ESP-NOW");
-    //     return;
-    // }
-
-    set_espnow(ESP_NOW_ROLE_COMBO);
+    if (!set_espnow(ESP_NOW_ROLE_COMBO)) {
+        Serial.println("Error initializing ESP-NOW");
+        return;
+    }
     set_peer(macNodeMCU, ESP_NOW_ROLE_COMBO);
     
     // Once ESPNow is successfully Init, we will register for Send CB to
