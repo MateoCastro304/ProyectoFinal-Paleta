@@ -10,7 +10,7 @@ Adafruit_BMP280 BMP; // I2C
 void SerialValueBattery(){
   //Serial.clear();
   //Serial.setCursor(0,0);
-  int adcValue = analogRead(analogInPin);
+  int adcValue = analogRead(PIN_BAT);
   float batCharge = ((float) adcValue * 5.1)/1023.0;
   Serial.println();
   Serial.print("[ADC] = ");
@@ -25,14 +25,14 @@ void SerialValueBattery(){
 void setup()
 {
   
-  pinMode(analogInPin, INPUT);
-  pinMode(mosfetSupplyPin, OUTPUT);
+  pinMode(PIN_BAT, INPUT);
+  pinMode(PIN_MOSFET, OUTPUT);
 
-  pinMode(ledGolpe, OUTPUT);
-  pinMode(ledState,OUTPUT);
+  pinMode(PIN_LED0, OUTPUT);
+  pinMode(PIN_LED1,OUTPUT);
   
-  digitalWrite(mosfetSupplyPin, HIGH);
-  digitalWrite(ledState, HIGH);
+  digitalWrite(PIN_MOSFET, HIGH);
+  digitalWrite(PIN_LED1, HIGH);
 
   Serial.begin(9600);
   Serial.println();
@@ -114,9 +114,9 @@ void loop()
     
     daToSend.golpes++;
     esp_now_send(macNodeMCU, (uint8_t *) &daToSend, sizeof(daToSend));
-    digitalWrite(ledGolpe, HIGH); // Encender LED
+    digitalWrite(PIN_LED0, HIGH); // Encender LED
     delay(1000);             // Mantener encendido por 100 ms
-    digitalWrite(ledGolpe, LOW);  // Apagar LED
+    digitalWrite(PIN_LED0, LOW);  // Apagar LED
 
     MPU.getIntStatus();
   }

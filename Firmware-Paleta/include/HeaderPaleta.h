@@ -9,10 +9,10 @@
 #include "IMUPadel.h"
 #include "EspNow-Paddel.h"
 
-#define mosfetSupplyPin 13  //D7
-#define analogInPin 17      // ESP8266 Analog Pin ADC0 = 17
-#define ledGolpe 16         //D0
-#define ledState 14         //D5
+#define PIN_MOSFET 13  //D7
+#define PIN_BAT 17      // ESP8266 Analog Pin ADC0 = 17
+#define PIN_LED0 16         //D0
+#define PIN_LED1 14         //D5
 #define PIN_SCL 5           //D1
 #define PIN_SDA 4           //D2
 #endif
