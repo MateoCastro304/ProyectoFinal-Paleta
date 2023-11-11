@@ -44,6 +44,5 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len); ///Desempaque
 
 void send_to_peer(uint8_t *structurePointer, int structureLength);
 data_paddel get_data_recv();
-bool flag_is_recv();
-void clear_flag();
+
 #endif

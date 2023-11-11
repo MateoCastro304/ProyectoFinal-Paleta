@@ -34,12 +34,6 @@ data_paddel myData;
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
     Serial.print("Sending... Delivery: ");
     Serial.println(!sendStatus ? "Success":"Fail");
-    /*if (sendStatus == 0){
-    Serial.println("Success");
-    }
-    else{
-        Serial.println("Fail");
-    }*/
 }
 void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
     Serial.println("DATA RECEIVE");
@@ -90,30 +84,41 @@ void setup() {
     Serial.println(WiFi.localIP());*/
 
     //Init ESP-NOW
-    if (esp_now_init() != 0) {
+    /*if (esp_now_init() != 0) {
         Serial.println("Error initializing ESP-NOW");
         return;
     }
     else{
       Serial.println("ESP-NOW Initialized");
-    }
+    }*/
   
     //Once ESPNow is successfully Init, we will register for recv CB to
     //get recv packer info
-    esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
+    /*esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
     esp_now_register_recv_cb(OnDataRecv);
 
     //Add peer
     esp_now_add_peer(macWemos, ESP_NOW_ROLE_COMBO, 1, NULL, 0);
+    esp_now_register_send_cb(OnDataSent);*/
+    
+    Serial.println(!esp_now_init() ? "ESPNOW Iniciado correctamente":"Error al iniciar ESPNOW");
+
+    esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
     esp_now_register_send_cb(OnDataSent);
+    esp_now_register_recv_cb(OnDataRecv);
+
+    //ESPNOW PEER CONFIG
+    Serial.println((!esp_now_add_peer(macWemos, ESP_NOW_ROLE_COMBO, 1, NULL, 0)) ? "Peer añadido":"Peer no añadido");
+    Serial.println((esp_now_is_peer_exist(macWemos) > 0) ? "Wemos Encontrada":"No se encontró Wemos");
     // esp_now_set_self_role(ESP_NOW_ROLE_SLAVE);
     // esp_now_register_recv_cb(OnDataRecv);
     
 }
 
 void loop() {
-    
-    
+    unsigned char send = 'a';
+    esp_now_send(macWemos,&send,sizeof(char));
+    delay(3000);
 }
 
 
