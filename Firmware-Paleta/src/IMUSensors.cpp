@@ -1,26 +1,38 @@
-#include "IMUPadel.h"
+#include "IMUSensors.h"
 //MPU6050 MPU(0x68);
-bool mpuSetConfig(){
+MPU6050 MPU(0x68);
+bool mpu_set_config(){
     MPU.initialize();
-    //Serial.println(mpu.testConnection() ? "IMU iniciado correctamente" : "Error al iniciar IMU");
-    if (!MPU.testConnection()){
-        return false;
-    }
-    
     // Configurar sensibilidad del acelerómetro (0 = +/- 2g, 1 = +/- 4g, 2 = +/- 8g, 3 = +/- 16g)
-    MPU.setFullScaleAccelRange(0);
-
+    if (!MPU.testConnection()){
+        Serial.println("Error al iniciar");
+        return false;
+    }else
+    {
+        MPU.setFullScaleAccelRange(0);
+        MPU.setFullScaleGyroRange(0);
+        Serial.println("MPU Seteado");
+        mpu_set_interrupt();
+        Serial.println("Interrupciones Seteadas");
+        set_offsets();
+        Serial.println("OffSets Configurados");
+        return true;
+    }
+   
+    
+}
+bool mpu_set_interrupt(){
     // Configurar interrupción para detección de golpes (opcional)
+    bool test = false;
     MPU.setIntDataReadyEnabled(false);  // Deshabilitar interrupción de datos listos
     MPU.setInterruptMode(1);            // Interrupción cuando se detecta un golpe
     MPU.setInterruptLatch(0);           // Latch hasta que se lea el registro INT_STATUS
     MPU.setMotionDetectionThreshold(100); // Establecer umbral de detección de movimiento (ajustar según sea necesario)
     MPU.setMotionDetectionDuration(2);  // Establecer duración mínima para que se considere un golpe
-
-
-    return MPU.testConnection();
+    test = true;
+    return test;
 }
-ang updateRotation()
+ang update_rotation()
 {
     static int16_t ax, ay, az;
     static int16_t gx, gy, gz;
@@ -48,4 +60,31 @@ ang updateRotation()
     ang_y_prev = inclinacion.y;
 
     return inclinacion;
+}
+bool golpe_detectado(){
+    if (MPU.getIntMotionStatus()) {
+        MPU.getIntStatus();
+        return true;
+    }
+    else return false;
+}
+bool get_estado_mpu(){
+    return MPU.testConnection();
+}
+void set_offsets(){
+    /*
+Sensor readings with offsets:   -1      1       16380   -1      0       -1
+                Your offsets:   -1250   -1713   1028    43      7       -19
+Data is printed as:             acelX   acelY   acelZ   giroX   giroY   giroZ
+Check that your sensor readings are close to 0 0 16384 0 0 0
+If calibration was succesful write down your offsets so you can set
+them in your projects using something similar to mpu.setXAccelOffset(youroffset)
+*/
+    MPU.setXAccelOffset(-1250);
+    MPU.setYAccelOffset(1713);
+    MPU.setZAccelOffset(1028);
+
+    MPU.setXGyroOffset(43);
+    MPU.setYGyroOffset(7);
+    MPU.setZGyroOffset(19);
 }

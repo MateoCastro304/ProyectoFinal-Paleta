@@ -56,8 +56,8 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   }
 
 #ifndef STASSID
-    #define STASSID "Electronica_ALUMNOS"
-    #define STAPSK  "alumnosElec2022"
+    #define STASSID "MateoA52"
+    #define STAPSK  "mateo033121"
 #endif
 
 void setup() {
@@ -70,18 +70,18 @@ void setup() {
     WiFi.mode(WIFI_STA);
     Serial.println(WiFi.macAddress());
     
-    //WiFi.mode(WIFI_STA);
-    //WiFi.begin(STASSID, STAPSK);
-    //Serial.print("\nConnecting to ");
-    //Serial.println(STASSID);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(STASSID, STAPSK);
+    Serial.print("\nConnecting to ");
+    Serial.println(STASSID);
 
-    /*while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED) {
       Serial.print('.');
       delay(500);
-    }*/
-    /*Serial.println();
+    }
+    Serial.println();
     Serial.print("connected, address=");
-    Serial.println(WiFi.localIP());*/
+    Serial.println(WiFi.localIP());
 
     //Init ESP-NOW
     /*if (esp_now_init() != 0) {

@@ -4,7 +4,7 @@
 #include "I2Cdev.h"
 #include "MPU6050.h"
 #include "Wire.h"
-#define ADDRESS 0x69
+#define ADDRESS 0x68
  
 ///////////////////////////////////   CONFIGURATION   /////////////////////////////
 //Change this 3 variables if you want to fine tune the skecth to your needs.
@@ -17,7 +17,7 @@ int giro_deadzone=1;     //Giro error allowed, make it lower to get more precisi
 // AD0 low = 0x68 (default for InvenSense evaluation board)
 // AD0 high = 0x69
 //MPU6050 accelgyro;
-MPU6050 accelgyro(ADDRESS); // <-- use for AD0 high
+MPU6050 accelgyro(0x68); // <-- use for AD0 high
  
 int16_t ax, ay, az,gx, gy, gz;
  
@@ -26,11 +26,18 @@ int ax_offset,ay_offset,az_offset,gx_offset,gy_offset,gz_offset;
 
 void meansensors();
 void calibration();
-
+/*
+Sensor readings with offsets:   -1      1       16380   -1      0       -1
+Your offsets:   -1250   -1713   1028    43      7       -19
+Data is printed as: acelX acelY acelZ giroX giroY giroZ
+Check that your sensor readings are close to 0 0 16384 0 0 0
+If calibration was succesful write down your offsets so you can set
+them in your projects using something similar to mpu.setXAccelOffset(youroffset)
+*/
 ///////////////////////////////////   SETUP   ////////////////////////////////////
 void setup() {
   // join I2C bus (I2Cdev library doesn't do this automatically)
-  Wire.begin(D1,D2);
+  Wire.begin(D2,D1);
   // COMMENT NEXT LINE IF YOU ARE USING ARDUINO DUE
   // initialize serial communication
   Serial.begin(9600);

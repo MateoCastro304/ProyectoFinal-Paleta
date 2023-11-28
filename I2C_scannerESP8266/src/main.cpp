@@ -19,28 +19,28 @@ void setup()
 	digitalWrite(PIN_MOSFET,HIGH);
 	Wire.begin(SDA_PIN, SCL_PIN);
 	
-	Serial.begin(9600);
-	while (!Serial) {};
-	if (!BMP.begin(BMP280_ADDRESS_ALT))
-  	{
-    Serial.println("No se pudo iniciar BMP");
-	digitalWrite(D5,HIGH);
-  	}else{
-    Serial.println("BMP Iniciado correctamente");
-	digitalWrite(D5,LOW);
-  	}
+	// Serial.begin(9600);
+	// while (!Serial) {};
+	// if (!BMP.begin(BMP280_ADDRESS_ALT))
+  	// {
+    // Serial.println("No se pudo iniciar BMP");
+	// digitalWrite(D5,HIGH);
+  	// }else{
+    // Serial.println("BMP Iniciado correctamente");
+	// digitalWrite(D5,LOW);
+  	// }
 
-  	BMP.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
-                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
-                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
-                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
-                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
-	//scanner.Init();
+  	// BMP.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+    //               Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+    //               Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+    //               Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+    //               Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+	scanner.Init();
 }
 
 void loop() 
 {
-	//scanner.Scan();
+	scanner.Scan();
 	delay(5000);
 }
 /*#include <Wire.h> 
